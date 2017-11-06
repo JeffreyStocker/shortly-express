@@ -114,9 +114,16 @@ app.post('/links',
 app.post('/signup', function(req, res, next) {
   console.log('signup body: ', req.body);
   // console.log ('db:', db);
-  db.query('select * from users', function (error, response) {
+  // db.query('select * from users', function (error, response) {
+  //   console.log (response);
+  // });
+  var salt = 'salty';
+  db.query(`INSERT INTO users (username, password, salt) VALUES ("${req.body.username}", "${req.body.password}", "${salt}")`, function (err, response) {
+    if (err) { console.log(err); }
     console.log (response);
   });
+  
+  // redirect to index once user is created
   res.redirect('/index');
 });
 
