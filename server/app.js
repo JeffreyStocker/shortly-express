@@ -5,6 +5,7 @@ const partials = require('express-partials');
 const bodyParser = require('body-parser');
 const Auth = require('./middleware/auth');
 const models = require('./models');
+const db = require('./db/index.js');
 
 const app = express();
 
@@ -16,6 +17,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
 
+var loggify = function(request, response, next) {
+  console.log(`Request ${request.method} at ${request.url}`);
+  next();
+};
+
+var checkLogin = function(req, res, next) {
+  // if logged in
+    // next
+  // else
+    // redirect to signup
+  
+  if (false) {
+    next();
+  } else {
+    res.redirect('/signup');
+  }
+};
+
+app.use(loggify);
 
 app.get('/', 
 (req, res) => {
@@ -37,6 +57,19 @@ app.get('/links',
       res.status(500).send(error);
     });
 });
+
+app.get('/signup', (req, res, next) => {
+  console.log('Get /signup: ' + __dirname);
+  // res.redirect('/signup')
+  res.render('signup');
+});
+
+app.get('/login', (req, res, next) => {
+  console.log('Get /login: ' + __dirname);
+  res.render('login');
+});
+
+app.use('/links', checkLogin);
 
 app.post('/links', 
 (req, res, next) => {
@@ -78,7 +111,14 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 
-
+app.post('/signup', function(req, res, next) {
+  console.log('signup body: ', req.body);
+  // console.log ('db:', db);
+  db.query('select * from users', function (error, response) {
+    console.log (response);
+  });
+  res.redirect('/index');
+});
 
 /************************************************************/
 // Handle the code parameter route last - if all other routes fail
