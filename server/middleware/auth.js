@@ -8,18 +8,36 @@ module.exports.createSession = (req, res, next) => {
     .then((data) => {
       return models.Sessions.get({id: data.insertId});
     }).then((data) => {
-      console.log('wait');
       req.session = {hash: data.hash};
-      console.log('rs: ', req.session);
+      // res.cookies = {shortlyid: req.session.hash};
+      console.log ('hash', req.session.hash);
+      res.cookies = {shortlyid: {value: req.session.hash}};
       next();
     })
+    // .then((data) => {
+    //   console.log (data)
+    //   res.cookies = data;
+    //   next();
+    // })
     .catch((err) => {
       console.log('createSession: error ', err);
-      next();
+      // next();
     });
   }
 };
 
+
+var createCookies = function (req, res) {
+  return new Promise ((resolve, reject) => {
+    var output = {'Set-Cookie': `shortlyid=${req.session.hash}`,
+    'Content-Type': 'text/plain'}
+    resolve (output);
+  });
+  // res.writeHead(200, {'Set-Cookie': `shortlyid=${req.session.hash}`,
+  //   'Content-Type': 'text/plain'
+  // });
+  return res;
+};
 
 /************************************************************/
 // Add additional authentication middleware functions below
@@ -62,13 +80,6 @@ module.exports.checkLogin = function(req, res, next) {
   } else {
     next();
   }
-};
-
-
-var createCookies = function (req, res, next) {
-  res.writeHead(200, {'Set-Cookie': `shortlyid=${req.XXXXXXX}`,
-    'Content-Type': 'text/plain'
-  });
 };
 
 
