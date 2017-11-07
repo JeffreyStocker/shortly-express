@@ -23,22 +23,11 @@ var loggify = function(request, response, next) {
   next();
 };
 
-var checkLogin = function(req, res, next) {
-  // if logged in
-    // next
-  // else
-    // redirect to signup
-  
-  if (false) {
-    next();
-  } else {
-    res.redirect('/signup');
-  }
-};
 
 app.use(loggify);
 
 app.use(cookieParser);
+app.use(Auth.checkLogin);
 
 app.get('/', 
 (req, res) => {
@@ -71,8 +60,6 @@ app.get('/login', (req, res, next) => {
   // console.log('Get /login: ' + __dirname);
   res.render('login');
 });
-
-app.use('/links', checkLogin);
 
 app.post('/links', 
 (req, res, next) => {
