@@ -9,35 +9,33 @@ module.exports.createSession = (req, res, next) => {
       return models.Sessions.get({id: data.insertId});
     }).then((data) => {
       req.session = {hash: data.hash};
-      // res.cookies = {shortlyid: req.session.hash};
-      console.log ('hash', req.session.hash);
       res.cookies = {shortlyid: {value: req.session.hash}};
       next();
     })
-    // .then((data) => {
-    //   console.log (data)
-    //   res.cookies = data;
-    //   next();
-    // })
     .catch((err) => {
       console.log('createSession: error ', err);
-      // next();
     });
+  } else {
+    if (req.cookies.shortlyid) {
+      models.Sessions.get({hash: req.cookies.shortlyid})
+      .then((data) => {
+        console.log(data);
+        req.session = {hash: data.hash};
+        
+        //query users to get the username and ID
+        //if exist then update session with userID
+        //then set req.session  with user:username, userId: userID
+        
+        
+        next();
+      })
+      .catch ((err) => {
+        console.log(err);
+      });
+    }
   }
 };
 
-
-var createCookies = function (req, res) {
-  return new Promise ((resolve, reject) => {
-    var output = {'Set-Cookie': `shortlyid=${req.session.hash}`,
-    'Content-Type': 'text/plain'}
-    resolve (output);
-  });
-  // res.writeHead(200, {'Set-Cookie': `shortlyid=${req.session.hash}`,
-  //   'Content-Type': 'text/plain'
-  // });
-  return res;
-};
 
 /************************************************************/
 // Add additional authentication middleware functions below
