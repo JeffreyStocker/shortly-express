@@ -124,6 +124,26 @@ app.post('/signup', function(req, res, next) {
   });
 });
 
+app.post('/login', (req, res, next) => {
+  models.Users.get({username: req.body.username})
+  .then((storedCredentials) => {
+    // data contains:
+      // username, password, salt
+    return models.Users.compare(req.body.password, storedCredentials.password, storedCredentials.salt);
+  })
+  .then((isAuthorized) => {
+    if (isAuthorized) {
+      res.redirect('/');
+    } else {
+      res.redirect('/login');
+    }
+  })
+  .catch(err => {
+    console.error('login error');
+    res.redirect('/login');
+  });
+});
+
 /************************************************************/
 // Handle the code parameter route last - if all other routes fail
 // assume the route is a short code and try and handle it here.
