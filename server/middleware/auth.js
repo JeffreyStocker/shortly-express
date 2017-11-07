@@ -25,8 +25,12 @@ module.exports.createSession = (req, res, next) => {
         //query users to get the username and ID
         //if exist then update session with userID
         //then set req.session  with user:username, userId: userID
-        
-        
+        return models.Users.get({id: data.userId});
+      })
+      .then ((userData) => {
+        console.log('ud', userData);
+        req.session.user = {username: userData.username};
+        req.session.userId = userData.id;
         next();
       })
       .catch ((err) => {
