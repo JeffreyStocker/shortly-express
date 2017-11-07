@@ -27,11 +27,11 @@ var createCookies = function (toInsert = {}) {
 
 module.exports.createSession = (req, res, next) => {
   if (!Object.keys(req.cookies).length) {
+    console.log('here 1');
     makeSession()
     .then ((data)=>{
       req.session = {hash: data.hash};
       res.cookies = {shortlyid: {value: req.session.hash}};
-      // createCookies({shortlyid: {value: req.session.hash}});
       next();
     })
     .catch(error => {
@@ -53,7 +53,6 @@ module.exports.createSession = (req, res, next) => {
           .then ((data)=>{
             req.session = {hash: data.hash};
             res.cookies = {shortlyid: {value: req.session.hash}};
-            // createCookies({shortlyid: {value: req.session.hash}});
             next();
           })
           .catch(error => {
@@ -78,6 +77,60 @@ module.exports.createSession = (req, res, next) => {
     }
   }
 };
+
+
+
+// module.exports.createSession_Condensed = (req, res, next) => {
+//   if (!Object.keys(req.cookies).length) {
+//     makeSession()
+//     .then ((data)=>{
+//       req.session = {hash: data.hash};
+//       res.cookies = {shortlyid: {value: req.session.hash}};
+//       next();
+//     })
+//     .catch(error => {
+//       console.log(error);
+//     });     
+//   } else {
+//     if (req.cookies.shortlyid) {
+//       models.Sessions.get({hash: req.cookies.shortlyid})
+//       .then((data) => {
+//         if (data) {
+//           console.log('data from session get hash', data);
+//           req.session = {hash: data.hash};
+//           return models.Users.get({id: data.userId});
+//         } else {
+//           res.cookies = {};
+//           res.session = {};
+//           ///// make new cookies
+//           makeSession()
+//           .then ((data)=>{
+//             req.session = {hash: data.hash};
+//             res.cookies = {shortlyid: {value: req.session.hash}};
+//             next();
+//           })
+//           .catch(error => {
+//             console.log(error);
+//           });
+//         }
+//       })
+//       .then ((userData) => {
+//         if (userData !== undefined) {
+//           console.log('ud', userData);
+//           req.session.user = {username: userData.username};
+//           req.session.userId = userData.id;
+//         } else {
+//           console.log('no user data');
+//         }
+//         next();
+//       })
+//       .catch ((err) => {
+//         console.log(err);
+//         // next();
+//       });
+//     }
+//   }
+// };
 
 
 /************************************************************/
