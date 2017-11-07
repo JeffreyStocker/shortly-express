@@ -2,39 +2,78 @@ const models = require('../models');
 const Promise = require('bluebird');
 const utils = require('../lib/hashUtils');
 
+var makeSession = function () {
+  return new Promise ((resolve, reject) => {
+    models.Sessions.create()
+      .then((data) => {
+        return models.Sessions.get({id: data.insertId});
+      }).then((data) => {
+        resolve (data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+
+var createCookies = function (toInsert = {}) {
+  Object.keys(inInsert).forEach(key => {
+    res.cookies[key] = inInsert[key];
+  });
+  // res.cookies = {shortlyid: {value: req.session.hash}};
+};
+
+
 module.exports.createSession = (req, res, next) => {
   if (!Object.keys(req.cookies).length) {
-    models.Sessions.create()
-    .then((data) => {
-      return models.Sessions.get({id: data.insertId});
-    }).then((data) => {
+    makeSession()
+    .then ((data)=>{
       req.session = {hash: data.hash};
       res.cookies = {shortlyid: {value: req.session.hash}};
+      // createCookies({shortlyid: {value: req.session.hash}});
       next();
     })
-    .catch((err) => {
-      console.log('createSession: error ', err);
-    });
+    .catch(error => {
+      console.log(error);
+    });     
   } else {
     if (req.cookies.shortlyid) {
       models.Sessions.get({hash: req.cookies.shortlyid})
       .then((data) => {
-        console.log(data);
-        req.session = {hash: data.hash};
-        
-        //query users to get the username and ID
-        //if exist then update session with userID
-        //then set req.session  with user:username, userId: userID
-        return models.Users.get({id: data.userId});
+        if (data) {
+          console.log('data from session get hash', data);
+          req.session = {hash: data.hash};
+          return models.Users.get({id: data.userId});
+        } else {
+          res.cookies = {};
+          res.session = {};
+          ///// make new cookies
+          makeSession()
+          .then ((data)=>{
+            req.session = {hash: data.hash};
+            res.cookies = {shortlyid: {value: req.session.hash}};
+            // createCookies({shortlyid: {value: req.session.hash}});
+            next();
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        }
       })
       .then ((userData) => {
-        console.log('ud', userData);
-        req.session.user = {username: userData.username};
-        req.session.userId = userData.id;
+        if (userData !== undefined) {
+          console.log('ud', userData);
+          req.session.user = {username: userData.username};
+          req.session.userId = userData.id;
+        } else {
+          console.log('no user data');
+        }
         next();
       })
       .catch ((err) => {
         console.log(err);
+        // next();
       });
     }
   }
