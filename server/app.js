@@ -111,24 +111,15 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 
-
-// console.log('Salt', utils.createSalt().toString('ascii'));
-// console.log('Salt', utils.createSalt().toString('utf8'));
-// console.log('Salt', utils.createSalt().toString('utf16le'));
-// console.log('Salt', utils.createSalt().toString('ucs2'));
-// console.log('Salt', utils.createSalt().toString('base64'));
-
 app.post('/signup', function(req, res, next) {
-  var salt = utils.createSalt().toString('base64').slice(0, 63);
-  var hashedPassword = utils.createHash(req.body.password, salt);
-
-  db.query(`INSERT INTO users (username, password, salt) VALUES ("${req.body.username}", "${hashedPassword}", "${salt}")`, function (err, response) {
-    if (err) {
-      if (err['code'] = 'ER_DUP_ENTRY') {
-        res.redirect('/signup');
-      }
-    } else {
-      res.redirect('/');
+  models.Users.create({username: req.body.username, password: req.body.username})
+  .then(function(data) {
+    console.log('data', data); 
+    res.redirect('/');
+  })
+  .catch(function (error) {
+    if (error['code'] = 'ER_DUP_ENTRY') {
+      res.redirect('/signup');
     }
   });
 });
