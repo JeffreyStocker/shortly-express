@@ -18,6 +18,10 @@ exports.createHash = (data, salt = '') => {
   return shasum.digest('hex');
 };
 
+exports.createSalt = (saltLength = 63) => {
+  return crypto.randomBytes(saltLength);
+};
+
 /**
  * Compares a value and a salt with a previously hashed value.
  * @param {string} attempted - The attempted value.

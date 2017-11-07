@@ -111,19 +111,22 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 
+
+// console.log('Salt', utils.createSalt().toString('ascii'));
+// console.log('Salt', utils.createSalt().toString('utf8'));
+// console.log('Salt', utils.createSalt().toString('utf16le'));
+// console.log('Salt', utils.createSalt().toString('ucs2'));
+// console.log('Salt', utils.createSalt().toString('base64'));
+
 app.post('/signup', function(req, res, next) {
-  console.log('signup body: ', req.body);
-  // console.log ('db:', db);
-  // db.query('select * from users', function (error, response) {
-  //   console.log (response);
-  // });
-  var salt = 'salty';
-  db.query(`INSERT INTO users (username, password, salt) VALUES ("${req.body.username}", "${req.body.password}", "${salt}")`, function (err, response) {
+  var salt = utils.createSalt().toString('base64').slice(0, 63);
+  var hashedPassword = utils.createHash(req.body.password, salt);
+
+  db.query(`INSERT INTO users (username, password, salt) VALUES ("${req.body.username}", "${hashedPassword}", "${salt}")`, function (err, response) {
     if (err) { console.log(err); }
     console.log (response);
   });
   
-  // redirect to index once user is created
   res.redirect('/index');
 });
 
