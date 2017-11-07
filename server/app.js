@@ -123,11 +123,14 @@ app.post('/signup', function(req, res, next) {
   var hashedPassword = utils.createHash(req.body.password, salt);
 
   db.query(`INSERT INTO users (username, password, salt) VALUES ("${req.body.username}", "${hashedPassword}", "${salt}")`, function (err, response) {
-    if (err) { console.log(err); }
-    console.log (response);
+    if (err) {
+      if (err['code'] = 'ER_DUP_ENTRY') {
+        res.redirect('/signup');
+      }
+    } else {
+      res.redirect('/');
+    }
   });
-  
-  res.redirect('/index');
 });
 
 /************************************************************/
