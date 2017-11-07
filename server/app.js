@@ -24,9 +24,10 @@ var loggify = function(request, response, next) {
 };
 
 
-app.use(loggify);
+// app.use(loggify);
 
 app.use(cookieParser);
+// app.use(Auth.createSession);
 // app.use(Auth.checkLogin);
 
 app.get('/', 

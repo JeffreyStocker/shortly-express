@@ -1,9 +1,25 @@
 const models = require('../models');
 const Promise = require('bluebird');
+const utils = require('../lib/hashUtils');
 
 module.exports.createSession = (req, res, next) => {
-
+  if (!Object.keys(req.cookies).length) {
+    models.Sessions.create()
+    .then((data) => {
+      return models.Sessions.get({id: data.insertId});
+    }).then((data) => {
+      console.log('wait');
+      req.session = {hash: data.hash};
+      console.log('rs: ', req.session);
+      next();
+    })
+    .catch((err) => {
+      console.log('createSession: error ', err);
+      next();
+    });
+  }
 };
+
 
 /************************************************************/
 // Add additional authentication middleware functions below
@@ -19,6 +35,7 @@ if request has cookie,
 
 */
 var checkAuthroization = function (req, res, next) {
+  next();
   
   
   
@@ -30,16 +47,20 @@ var checkAuthroization = function (req, res, next) {
 
 
 module.exports.checkLogin = function(req, res, next) {
+  console.log(req.url);
   //somehow figure out the session info from here
-  if (req.cookies) {
+  if (Object.keys(req.cookies).length) {
+    console.log('COOKIES', req.cookies);
     var userProperty = req.parsedCookies; //get from parse cookie
-    if (!util.Sessions.isLoggedIn(req.session)) { //if has cookies, and is not logged itn
+    if (!utils.Sessions.isLoggedIn(req.session)) { //if has cookies, and is not logged itn
       res.redirect('/login');
     } else {
       next();
     }
-  } else {
+  } else if (req.url !== '/login' && req.url !== '/signup') {
     res.redirect('/login');
+  } else {
+    next();
   }
 };
 
