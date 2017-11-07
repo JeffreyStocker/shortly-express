@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const Auth = require('./middleware/auth');
 const models = require('./models');
 const db = require('./db/index.js');
+const cookieParser = require('./middleware/cookieParser');
 
 const app = express();
 
@@ -37,6 +38,8 @@ var checkLogin = function(req, res, next) {
 
 app.use(loggify);
 
+app.use(cookieParser);
+
 app.get('/', 
 (req, res) => {
   res.render('index');
@@ -59,13 +62,13 @@ app.get('/links',
 });
 
 app.get('/signup', (req, res, next) => {
-  console.log('Get /signup: ' + __dirname);
+  // console.log('Get /signup: ' + __dirname);
   // res.redirect('/signup')
   res.render('signup');
 });
 
 app.get('/login', (req, res, next) => {
-  console.log('Get /login: ' + __dirname);
+  // console.log('Get /login: ' + __dirname);
   res.render('login');
 });
 
@@ -114,7 +117,7 @@ app.post('/links',
 app.post('/signup', function(req, res, next) {
   models.Users.create({username: req.body.username, password: req.body.username})
   .then(function(data) {
-    console.log('data', data); 
+    // console.log('data', data); 
     res.redirect('/');
   })
   .catch(function (error) {
