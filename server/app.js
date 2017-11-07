@@ -27,7 +27,7 @@ var loggify = function(request, response, next) {
 app.use(loggify);
 
 app.use(cookieParser);
-app.use(Auth.checkLogin);
+// app.use(Auth.checkLogin);
 
 app.get('/', 
 (req, res) => {

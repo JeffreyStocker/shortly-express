@@ -10,7 +10,7 @@ const parseCookies = (req, res, next) => {
     list[parts.shift().trim()] = decodeURI(parts.join('='));
   });
   
-  req.parsedCookies = list;
+  req.cookies = list;
   
   next();
 };
